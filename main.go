@@ -5,11 +5,12 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/hopesain/onekhusa-client/services"
 	"github.com/joho/godotenv"
 )
 
 func init() {
-	err :=godotenv.Load()
+	err := godotenv.Load()
 	if err != nil {
 		slog.Error("Unable to load the env variables", "error", err)
 		os.Exit(1)
@@ -18,5 +19,5 @@ func init() {
 
 func main() {
 	fmt.Println("Hello world.")
+	fmt.Println(services.GetMerchantAccountNumber())
 }
-
