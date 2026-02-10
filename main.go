@@ -20,4 +20,6 @@ func init() {
 func main() {
 	fmt.Println("Hello world.")
 	fmt.Println(services.GetMerchantAccountNumber())
+	token, _ := services.GetAccessToken()
+	fmt.Println(token)
 }
