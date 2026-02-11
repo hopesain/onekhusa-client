@@ -20,6 +20,8 @@ func UploadBatchJSONClient(
 		return nil, err
 	}
 
+	slog.Info("Batch payload being sent", "payload", string(payload))
+
 	url := "https://api.onekhusa.com/sandbox/v1/disbursements/batch/addJson"
 
 	request, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(payload))
@@ -45,6 +47,10 @@ func UploadBatchJSONClient(
 	}
 
 	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK || response.StatusCode != http.StatusAccepted {
+		slog.Warn("response code", "statusCode", response.StatusCode)
+	}
 
 	err = json.NewDecoder(response.Body).Decode(&responseData)
 	if err != nil {

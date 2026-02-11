@@ -8,7 +8,7 @@ type BatchJSONUploadRequest struct {
 type HeaderSection struct {
 	MerchantAccountNumber int     `json:"merchantAccountNumber"`
 	IsBatchScheduled      bool    `json:"isBatchScheduled"`
-	ScheduledDate         *string `json:"scheduledDate,omitempty"`
+	ScheduledDate         string `json:"scheduledDate"`
 	CapturedBy            string  `json:"capturedBy"`
 }
 
