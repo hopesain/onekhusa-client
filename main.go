@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"log/slog"
 	"os"
 
@@ -22,4 +23,10 @@ func main() {
 	fmt.Println(services.GetMerchantAccountNumber())
 	token, _ := services.GetAccessToken()
 	fmt.Println(token)
+	resp, err := services.TopupMerchantAccount(token)
+	if err != nil {
+		log.Fatalf("Topup failed: %v", err)
+	}
+
+	fmt.Printf("Topup Response:\n%+v\n", resp)
 }
