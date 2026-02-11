@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/hopesain/onekhusa-client/models"
 )
 
@@ -61,4 +62,8 @@ func GetAccessToken() (accessToken string, err error) {
 	}
 
 	return tokenResponse.AccessToken, nil
+}
+
+func GenerateIdempotencyKey() string {
+	return uuid.NewString()
 }
