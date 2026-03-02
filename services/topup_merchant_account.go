@@ -11,7 +11,7 @@ import (
 	"github.com/hopesain/onekhusa-client/models"
 )
 
-func TopupMerchantAccount(accessToken string) (string, error) {
+func TopupMerchantAccount(accessToken string) (models.TopupMerchantAccountResponse, error) {
 	merchantAccountNumber := GetMerchantAccountNumber()
 	adminEmail := GetAdminEmail()
 
@@ -25,14 +25,14 @@ func TopupMerchantAccount(accessToken string) (string, error) {
 	jsonPayload, err := json.Marshal(payload)
 	if err != nil {
 		slog.Error("Failed to marshal payload", "error", err)
-		return "", err
+		return models.TopupMerchantAccountResponse{}, err
 	}
 
 	url := "https://api.onekhusa.com/sandbox/v1/merchants/accounts/topup"
 	request, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonPayload))
 	if err != nil {
 		slog.Error("Failed to create request", "error", err)
-		return "", err
+		return models.TopupMerchantAccountResponse{}, err
 	}
 
 	request.Header.Set("Authorization", "Bearer "+accessToken)
@@ -42,21 +42,21 @@ func TopupMerchantAccount(accessToken string) (string, error) {
 	response, err := client.Do(request)
 	if err != nil {
 		slog.Error("Request failed", "error", err)
-		return "", err
+		return models.TopupMerchantAccountResponse{}, err
 	}
 	defer response.Body.Close()
 
 	bodyBytes, err := io.ReadAll(response.Body)
 	if err != nil {
 		slog.Error("Failed to read response body", "error", err)
-		return "", err
+		return models.TopupMerchantAccountResponse{}, err
 	}
 
-	var message string
+	var topupResponse models.TopupMerchantAccountResponse
 
-	if err := json.Unmarshal(bodyBytes, &message); err != nil {
-		message = string(bodyBytes)
+	if err := json.Unmarshal(bodyBytes, &topupResponse); err != nil {
+		return models.TopupMerchantAccountResponse{}, err
 	}
 
-	return message, nil
+	return topupResponse, nil
 }
