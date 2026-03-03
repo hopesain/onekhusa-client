@@ -21,7 +21,6 @@ func init() {
 func main() {
 	//Get Access Token
 	token, _ := services.GetAccessToken()
-	fmt.Println(token)
 
 	// Uncomment this to test account topup.
 	// TopUp Merchant Account

@@ -18,7 +18,7 @@ func TopupMerchantAccount(accessToken string) (models.TopupMerchantAccountRespon
 	payload := models.TopupMerchantAccountRequest{
 		MerchantAccountNumber: merchantAccountNumber,
 		ConnectorID:           221500, //FDH Bank
-		TopupAmount:           10000000,
+		TopupAmount:           100000000,
 		CreatedBy:             adminEmail,
 	}
 
