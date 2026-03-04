@@ -3,6 +3,7 @@ package services
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
@@ -45,6 +46,8 @@ func TopupMerchantAccount(accessToken string) (models.TopupMerchantAccountRespon
 		return models.TopupMerchantAccountResponse{}, err
 	}
 	defer response.Body.Close()
+
+	fmt.Println(response.StatusCode)
 
 	bodyBytes, err := io.ReadAll(response.Body)
 	if err != nil {
