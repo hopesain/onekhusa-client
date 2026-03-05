@@ -9,13 +9,6 @@ import (
 	"time"
 )
 
-// payload := TopupMerchantAccountRequest{
-// 		MerchantAccountNumber: merchantAccountNumber,
-// 		ConnectorID:           221500, //FDH Bank
-// 		TopupAmount:           100000000,
-// 		CreatedBy:             adminEmail,
-// 	}
-
 func TopupMerchantAccount(accessToken string, payloadInput TopupMerchantAccountRequest) (TopupMerchantAccountResponse, error) {
 	payload := payloadInput
 
