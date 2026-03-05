@@ -40,7 +40,11 @@ func GetAccessToken(input AccessTokenRequest) (AccessTokenResponse, error) {
 	client := http.Client{Timeout: 30 * time.Second}
 	response, err := client.Do(request)
 	if err != nil {
-		slog.Error("HTTP request failed", "error", err)
+		slog.Error(
+			"Failed to send an HTTP request",
+			"Context", "Get access token from oneKhusa",
+			"Error", err,
+		)
 		return AccessTokenResponse{}, err
 	}
 
@@ -52,7 +56,11 @@ func GetAccessToken(input AccessTokenRequest) (AccessTokenResponse, error) {
 
 	err = json.Unmarshal(bodyBytes, &output)
 	if err != nil {
-		slog.Error("Failed decoding", "error", err)
+		slog.Error(
+			"Failed to unmarshal the output",
+			"Context", "Get access token from oneKhusa",
+			"Error", err,
+		)
 		return AccessTokenResponse{}, err
 	}
 

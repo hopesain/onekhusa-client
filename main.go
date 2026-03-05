@@ -7,7 +7,9 @@ import (
 	"os"
 
 	"github.com/hopesain/onekhusa-client/clients"
+	"github.com/hopesain/onekhusa-client/internal/authentication"
 	"github.com/hopesain/onekhusa-client/models"
+	"github.com/hopesain/onekhusa-client/pkg/utils"
 	"github.com/hopesain/onekhusa-client/services"
 	"github.com/joho/godotenv"
 )
@@ -21,6 +23,49 @@ func init() {
 }
 
 func main() {
+	apiKey := utils.GetOnekhusaApiKey()
+	secretKey := utils.GetOnekhusaSecretKey()
+	organizationID := utils.GetOrganizationID()
+	merchantAccountNumber, err := utils.GetMerchantAccountNumber()
+	if err != nil {
+		slog.Error(
+			"Failed to retrieve merchant account number",
+			"Error", err,
+		)
+		return
+	}
+
+	getAccessTokenInput := authentication.AccessTokenRequest{
+		APIKey: apiKey,
+		APISecret: secretKey,
+		OrganizationID: organizationID,
+		MerchantAccountNumber: merchantAccountNumber,
+	} 
+
+	tokenOutput, err := authentication.GetAccessToken(getAccessTokenInput)
+	if err != nil {
+		slog.Error(
+			"Failed to retrieve the access token",
+			"Error", err,
+		)
+		return
+	}
+
+	prettyAccessTokenData, err := json.MarshalIndent(tokenOutput, "", " ")
+	if err != nil {
+		slog.Error(
+			"Failed to marshal Indent",
+			"Error", err,
+		)
+		return
+	}
+	fmt.Println(string(prettyAccessTokenData))
+
+
+	accessToken := tokenOutput.AccessToken
+	fmt.Println(accessToken)
+
+
 	//Get Access Token
 	// token, _ := services.GetAccessToken()
 
