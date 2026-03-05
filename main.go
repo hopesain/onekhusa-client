@@ -8,6 +8,7 @@ import (
 
 	"github.com/hopesain/onekhusa-client/clients"
 	"github.com/hopesain/onekhusa-client/internal/authentication"
+	"github.com/hopesain/onekhusa-client/internal/disbursements/topup"
 	"github.com/hopesain/onekhusa-client/models"
 	"github.com/hopesain/onekhusa-client/pkg/utils"
 	"github.com/hopesain/onekhusa-client/services"
@@ -23,6 +24,7 @@ func init() {
 }
 
 func main() {
+	// Get Access Token
 	apiKey := utils.GetOnekhusaApiKey()
 	secretKey := utils.GetOnekhusaSecretKey()
 	organizationID := utils.GetOrganizationID()
@@ -36,11 +38,11 @@ func main() {
 	}
 
 	getAccessTokenInput := authentication.AccessTokenRequest{
-		APIKey: apiKey,
-		APISecret: secretKey,
-		OrganizationID: organizationID,
+		APIKey:                apiKey,
+		APISecret:             secretKey,
+		OrganizationID:        organizationID,
 		MerchantAccountNumber: merchantAccountNumber,
-	} 
+	}
 
 	tokenOutput, err := authentication.GetAccessToken(getAccessTokenInput)
 	if err != nil {
@@ -59,26 +61,34 @@ func main() {
 		)
 		return
 	}
+	fmt.Println("Access Token Details")
 	fmt.Println(string(prettyAccessTokenData))
 
-
 	accessToken := tokenOutput.AccessToken
-	fmt.Println(accessToken)
 
+	// Topup Merchant Account
+	adminEmail := utils.GetAdminEmail()
+	topupAccountInput := topup.TopupMerchantAccountRequest{
+		MerchantAccountNumber: merchantAccountNumber,
+		ConnectorID:           221500, //FDH Bank
+		TopupAmount:           100000000,
+		CreatedBy:             adminEmail,
+	}
 
-	//Get Access Token
-	// token, _ := services.GetAccessToken()
+	accountTopupResponse, err := topup.TopupMerchantAccount(accessToken, topupAccountInput)
 
-	// // Uncomment this to test account topup.
-	// // TopUp Merchant Account
-	// response, err := services.TopupMerchantAccount(token)
-	// if err != nil {
-	// 	slog.Error("Unable to topup merchant account", "error", err)
-	// 	return
-	// }
+	prettyAccountTopupResponse, err := json.MarshalIndent(accountTopupResponse, "", " ")
+	if err != nil {
+		slog.Error(
+			"Failed to marshal Indent accountTopupResponse",
+			"Error", err,
+		)
+		return
+	}
 
-	// prettyRensonse, _ := json.MarshalIndent(response, "", " ")
-	// fmt.Println(string(prettyRensonse))
+	fmt.Println("Topup Merchant Account Details")
+	fmt.Println(string(prettyAccountTopupResponse))
+
 
 	accountNumber := services.GetMerchantAccountNumber()
 	userEmail := services.GetAdminEmail()
