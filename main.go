@@ -111,7 +111,22 @@ func main() {
 	}
 
 	uploadBatchJSONResponse, err := uploads.UploadBatchJSONService(accessToken, batchRequestInputData)
-	pretty, _ := json.MarshalIndent(uploadBatchJSONResponse, "", "  ")
+	if err != nil {
+		slog.Error(
+			"Failed to upload batch JSON",
+			"Error", err,
+		)
+		return
+	}
+
+	pretty, err := json.MarshalIndent(uploadBatchJSONResponse, "", "  ")
+	if err != nil {
+		slog.Error(
+			"Failed to marshal Indent uploadBatchJSONResponse",
+			"Error", err,
+		)
+		return
+	}
 	fmt.Println("Upload Batch JSON Service")
 	fmt.Println(string(pretty))
 
