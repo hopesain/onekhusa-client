@@ -69,7 +69,7 @@ func main() {
 	topupAccountInput := topup.TopupMerchantAccountRequest{
 		MerchantAccountNumber: merchantAccountNumber,
 		ConnectorID:           221500, //FDH Bank
-		TopupAmount:           100000000,
+		TopupAmount:           10000000,
 		CreatedBy:             adminEmail,
 	}
 
