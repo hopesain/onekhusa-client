@@ -89,7 +89,6 @@ func main() {
 	fmt.Println("Topup Merchant Account Details")
 	fmt.Println(string(prettyAccountTopupResponse))
 
-
 	accountNumber := services.GetMerchantAccountNumber()
 	userEmail := services.GetAdminEmail()
 
