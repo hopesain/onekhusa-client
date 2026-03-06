@@ -134,8 +134,8 @@ func main() {
 
 	addWebhookInput := webhooks.AddWebhookRequest{
 		MerchantAccountNumber: accountNumber,
-		EventCode:             "batch.payout.success",
-		CallbackURL:           "http://localhost:8080/webhooks/batch-proceed",
+		EventCode:             "batch.failed",
+		CallbackURL:           "https://charmaine-astrometrical-ninfa.ngrok-free.dev/webhooks/batch-failed",
 		CapturedBy:            userEmail,
 	}
 
