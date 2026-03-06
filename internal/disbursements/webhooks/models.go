@@ -1,12 +1,12 @@
 package webhooks
 
 type AddWebhookRequest struct {
-	MerchantAccountNumber int
-	EventCode             string
-	CallbackURL           string
-	CapturedBy            string
+	MerchantAccountNumber int    `json:"merchantAccountNumber"`
+	EventCode             string `json:"eventCode"`
+	CallbackURL           string `json:"callbackURL"`
+	CapturedBy            string `json:"capturedBy"`
 }
 
 type AddWebhookResponse struct {
-	message string
+	Message string `json:"message"`
 }

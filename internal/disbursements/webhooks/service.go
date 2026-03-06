@@ -3,6 +3,7 @@ package webhooks
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 	"log/slog"
 	"net/http"
 	"time"
@@ -18,12 +19,14 @@ func AddWebhook(accessToken string, requestData AddWebhookRequest) (AddWebhookRe
 		)
 		return AddWebhookResponse{}, err
 	}
+
 	url := "https://api.onekhusa.com/sandbox/v1/merchants/webhooks/add"
+
 	request, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(payload))
 	if err != nil {
 		slog.Error(
 			"Failed to create a new request",
-			"Context", "Add Webook",
+			"Context", "Add Webhook",
 			"Error", err,
 		)
 		return AddWebhookResponse{}, err
@@ -43,24 +46,28 @@ func AddWebhook(accessToken string, requestData AddWebhookRequest) (AddWebhookRe
 		)
 		return AddWebhookResponse{}, err
 	}
-
 	defer response.Body.Close()
 
-	var message string
-
-	err = json.NewDecoder(response.Body).Decode(&message)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
-		slog.Error(
-			"Failed to decode the response", 
-			"Context", "Add Webook",
-			"Error", err,
-		)
 		return AddWebhookResponse{}, err
 	}
 
-	output := AddWebhookResponse{
-		message: message,
+	slog.Info("Webhook API response", "status", response.StatusCode, "body", string(body))
+
+	var output AddWebhookResponse
+
+	if len(body) > 0 {
+		err = json.Unmarshal(body, &output)
+		if err != nil {
+			slog.Error(
+				"Failed to decode the response",
+				"Context", "Add Webhook",
+				"Error", err,
+			)
+			return AddWebhookResponse{}, err
+		}
 	}
-	
+
 	return output, nil
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/hopesain/onekhusa-client/internal/authentication"
 	"github.com/hopesain/onekhusa-client/internal/disbursements/topup"
 	"github.com/hopesain/onekhusa-client/internal/disbursements/uploads"
+	"github.com/hopesain/onekhusa-client/internal/disbursements/webhooks"
 	"github.com/hopesain/onekhusa-client/pkg/utils"
 	"github.com/joho/godotenv"
 )
@@ -129,5 +130,23 @@ func main() {
 	}
 	fmt.Println("Upload Batch JSON Service")
 	fmt.Println(string(pretty))
+
+	addWebhookInput := webhooks.AddWebhookRequest{
+		MerchantAccountNumber: accountNumber,
+		EventCode:             "batch.payout.success",
+		CallbackURL:           "http://localhost:8080/webhooks/batch-proceed",
+		CapturedBy:            userEmail,
+	}
+
+	addWebhookOutput, err := webhooks.AddWebhook(accessToken, addWebhookInput)
+	prettyAddWebhook, err := json.MarshalIndent(addWebhookOutput, "", "  ")
+	if err != nil {
+		slog.Error(
+			"Failed to marshal Indent uploadBatchJSONResponse",
+			"Error", err,
+		)
+		return
+	}
+	fmt.Println(string(prettyAddWebhook))
 
 }
