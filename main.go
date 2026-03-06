@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"os"
 
 	"github.com/hopesain/onekhusa-client/internal/authentication"
@@ -148,5 +149,11 @@ func main() {
 		return
 	}
 	fmt.Println(string(prettyAddWebhook))
+
+	//Batch Failed Webhook
+	http.HandleFunc("/webhooks/batch-failed", webhooks.BatchFailedWebhook())
+
+	slog.Info("Server running on port 8080")
+	http.ListenAndServe(":8080", nil)
 
 }
