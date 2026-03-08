@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/hopesain/onekhusa-client/internal/authentication"
+	"github.com/hopesain/onekhusa-client/internal/disbursements/topup"
 	"github.com/hopesain/onekhusa-client/internal/disbursements/uploads"
 	"github.com/hopesain/onekhusa-client/internal/disbursements/webhooks"
 	"github.com/hopesain/onekhusa-client/pkg/utils"
@@ -68,28 +69,27 @@ func main() {
 
 	accessToken := tokenOutput.AccessToken
 
-	// // Topup Merchant Account
-	// adminEmail := utils.GetAdminEmail()
-	// topupAccountInput := topup.TopupMerchantAccountRequest{
-	// 	MerchantAccountNumber: merchantAccountNumber,
-	// 	ConnectorID:           221500, //FDH Bank
-	// 	TopupAmount:           10000000,
-	// 	CreatedBy:             adminEmail,
-	// }
+	// Topup Merchant Account
+	topupAccountInput := topup.TopupMerchantAccountRequest{
+		MerchantAccountNumber: merchantAccountNumber,
+		ConnectorID:           221500, //FDH Bank
+		TopupAmount:           10000000,
+		CreatedBy:             adminEmail,
+	}
 
-	// accountTopupResponse, err := topup.TopupMerchantAccount(accessToken, topupAccountInput)
+	accountTopupResponse, err := topup.TopupMerchantAccount(accessToken, topupAccountInput)
 
-	// prettyAccountTopupResponse, err := json.MarshalIndent(accountTopupResponse, "", " ")
-	// if err != nil {
-	// 	slog.Error(
-	// 		"Failed to marshal Indent accountTopupResponse",
-	// 		"Error", err,
-	// 	)
-	// 	return
-	// }
+	prettyAccountTopupResponse, err := json.MarshalIndent(accountTopupResponse, "", " ")
+	if err != nil {
+		slog.Error(
+			"Failed to marshal Indent accountTopupResponse",
+			"Error", err,
+		)
+		return
+	}
 
-	// fmt.Println("Topup Merchant Account Details")
-	// fmt.Println(string(prettyAccountTopupResponse))
+	fmt.Println("Topup Merchant Account Details")
+	fmt.Println(string(prettyAccountTopupResponse))
 
 	// Add Webhook
 	addWebhookInput := webhooks.AddWebhookRequest{
