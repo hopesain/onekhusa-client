@@ -8,7 +8,6 @@ import (
 	"os"
 
 	"github.com/hopesain/onekhusa-client/internal/authentication"
-	"github.com/hopesain/onekhusa-client/internal/disbursements/topup"
 	"github.com/hopesain/onekhusa-client/internal/disbursements/uploads"
 	"github.com/hopesain/onekhusa-client/internal/disbursements/webhooks"
 	"github.com/hopesain/onekhusa-client/pkg/utils"
@@ -28,6 +27,8 @@ func main() {
 	apiKey := utils.GetOnekhusaApiKey()
 	secretKey := utils.GetOnekhusaSecretKey()
 	organizationID := utils.GetOrganizationID()
+	adminEmail := utils.GetAdminEmail()
+
 	merchantAccountNumber, err := utils.GetMerchantAccountNumber()
 	if err != nil {
 		slog.Error(
@@ -36,6 +37,7 @@ func main() {
 		)
 		return
 	}
+	accountNumber := merchantAccountNumber
 
 	getAccessTokenInput := authentication.AccessTokenRequest{
 		APIKey:                apiKey,
@@ -66,39 +68,55 @@ func main() {
 
 	accessToken := tokenOutput.AccessToken
 
-	// Topup Merchant Account
-	adminEmail := utils.GetAdminEmail()
-	topupAccountInput := topup.TopupMerchantAccountRequest{
-		MerchantAccountNumber: merchantAccountNumber,
-		ConnectorID:           221500, //FDH Bank
-		TopupAmount:           10000000,
-		CreatedBy:             adminEmail,
+	// // Topup Merchant Account
+	// adminEmail := utils.GetAdminEmail()
+	// topupAccountInput := topup.TopupMerchantAccountRequest{
+	// 	MerchantAccountNumber: merchantAccountNumber,
+	// 	ConnectorID:           221500, //FDH Bank
+	// 	TopupAmount:           10000000,
+	// 	CreatedBy:             adminEmail,
+	// }
+
+	// accountTopupResponse, err := topup.TopupMerchantAccount(accessToken, topupAccountInput)
+
+	// prettyAccountTopupResponse, err := json.MarshalIndent(accountTopupResponse, "", " ")
+	// if err != nil {
+	// 	slog.Error(
+	// 		"Failed to marshal Indent accountTopupResponse",
+	// 		"Error", err,
+	// 	)
+	// 	return
+	// }
+
+	// fmt.Println("Topup Merchant Account Details")
+	// fmt.Println(string(prettyAccountTopupResponse))
+
+	// Add Webhook
+	addWebhookInput := webhooks.AddWebhookRequest{
+		MerchantAccountNumber: accountNumber,
+		EventCode:             "batch.failed",
+		CallbackURL:           "https://charmaine-astrometrical-ninfa.ngrok-free.dev/webhooks/batch-failed",
+		CapturedBy:            adminEmail,
 	}
 
-	accountTopupResponse, err := topup.TopupMerchantAccount(accessToken, topupAccountInput)
-
-	prettyAccountTopupResponse, err := json.MarshalIndent(accountTopupResponse, "", " ")
+	addWebhookOutput, err := webhooks.AddWebhook(accessToken, addWebhookInput)
+	prettyAddWebhook, err := json.MarshalIndent(addWebhookOutput, "", "  ")
 	if err != nil {
 		slog.Error(
-			"Failed to marshal Indent accountTopupResponse",
+			"Failed to marshal Indent uploadBatchJSONResponse",
 			"Error", err,
 		)
 		return
 	}
-
-	fmt.Println("Topup Merchant Account Details")
-	fmt.Println(string(prettyAccountTopupResponse))
+	fmt.Println(string(prettyAddWebhook))
 
 	//Upload Batch JSON
-	accountNumber := merchantAccountNumber
-	userEmail := adminEmail
-
 	var batchRequestInputData = uploads.BatchJSONUploadRequest{
 		Header: uploads.HeaderSection{
 			MerchantAccountNumber: accountNumber,
 			IsBatchScheduled:      false,
 			ScheduledDate:         nil,
-			CapturedBy:            userEmail,
+			CapturedBy:            adminEmail,
 		},
 		Transactions: []uploads.TransactionsSection{
 			{
@@ -131,24 +149,6 @@ func main() {
 	}
 	fmt.Println("Upload Batch JSON Service")
 	fmt.Println(string(pretty))
-
-	addWebhookInput := webhooks.AddWebhookRequest{
-		MerchantAccountNumber: accountNumber,
-		EventCode:             "batch.failed",
-		CallbackURL:           "https://charmaine-astrometrical-ninfa.ngrok-free.dev/webhooks/batch-failed",
-		CapturedBy:            userEmail,
-	}
-
-	addWebhookOutput, err := webhooks.AddWebhook(accessToken, addWebhookInput)
-	prettyAddWebhook, err := json.MarshalIndent(addWebhookOutput, "", "  ")
-	if err != nil {
-		slog.Error(
-			"Failed to marshal Indent uploadBatchJSONResponse",
-			"Error", err,
-		)
-		return
-	}
-	fmt.Println(string(prettyAddWebhook))
 
 	//Batch Failed Webhook
 	http.HandleFunc("/webhooks/batch-failed", webhooks.BatchFailedWebhook())

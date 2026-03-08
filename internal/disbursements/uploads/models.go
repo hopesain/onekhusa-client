@@ -22,6 +22,7 @@ type TransactionsSection struct {
 }
 
 type BatchJSONUploadResponse struct {
-	MerchantAccountNumber int64 `json:"merchantAccountNumber"`
-	BatchNumber           int64 `json:"batchNumber"`
+	MerchantAccountNumber int64  `json:"merchantAccountNumber"`
+	BatchNumber           int64  `json:"batchNumber"`
+	BatchStatusCode       string `json:"BatchStatusCode"`
 }
